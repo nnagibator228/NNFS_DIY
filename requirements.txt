@@ -1,0 +1,7 @@
+numpy
+opencv-python
+urllib3
+keras
+tensorflow
+scipy
+nnfs
