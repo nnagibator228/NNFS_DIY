@@ -266,8 +266,6 @@ class Optimizer_Adagrad:
                 (1. / (1. + self.decay * self.iterations))
 
     def update_params(self, layer):
-        # ------
-        # Добавить логику оптимайзера
         if hasattr(layer, 'weights'):
             if not hasattr(layer, 'weight_cache'):
                 layer.weight_cache = np.zeros_like(layer.weights)
@@ -279,6 +277,22 @@ class Optimizer_Adagrad:
             layer.weights += -self.current_learning_rate * \
                             layer.dweights / \
                             (np.sqrt(layer.weight_cache) + self.epsilon)
+            layer.biases += -self.current_learning_rate * \
+                            layer.dbiases / \
+                            (np.sqrt(layer.bias_cache) + self.epsilon)
+        
+        # Для convolutional
+        elif hasattr(layer, 'kernels'):
+            if not hasattr(layer, 'kernel_cache'):
+                layer.kernel_cache = np.zeros_like(layer.kernels)
+                layer.bias_cache = np.zeros_like(layer.biases)
+
+            layer.kernel_cache += layer.dkernels**2
+            layer.bias_cache += layer.dbiases**2
+
+            layer.kernels += -self.current_learning_rate * \
+                            layer.dkernels / \
+                            (np.sqrt(layer.kernel_cache) + self.epsilon)
             layer.biases += -self.current_learning_rate * \
                             layer.dbiases / \
                             (np.sqrt(layer.bias_cache) + self.epsilon)
@@ -886,7 +900,7 @@ model.add(Activation_Softmax())
 
 model.set(
     loss=Loss_CategoricalCrossentropy(),
-    optimizer=Optimizer_SGD(decay=1e-3, momentum=0.5),
+    optimizer=Optimizer_SGD(decay=1e-3, momentum=0.8),
     accuracy=Accuracy_Categorical()
 )
 
