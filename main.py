@@ -55,6 +55,7 @@ class Convolutional:
         self.input_depth = input_depth
         self.output_shape = (batch_size, depth, input_height - kernel_size + 1, input_width - kernel_size + 1)
         self.kernels_shape = (depth, input_depth, kernel_size, kernel_size)
+        self.dkernels = np.zeros(self.kernels_shape)
         self.kernels = np.random.randn(*self.kernels_shape)
         self.biases = np.random.randn(*self.output_shape)
 
@@ -66,17 +67,15 @@ class Convolutional:
                 for j in range(self.input_depth):
                     self.output[b][i] += signal.correlate2d(self.input[b][j], self.kernels[i, j], "valid")
 
-    def backward(self, output_gradient):
-        kernels_gradient = np.zeros(self.kernels_shape)
+    def backward(self, dvalues):
         input_gradient = np.zeros(self.input_shape)
+        self.dbiases = dvalues
         for b in range(self.batch_size):
             for i in range(self.depth):
                 for j in range(self.input_depth):
-                    kernels_gradient[i, j] = signal.correlate2d(self.input[b][j], output_gradient[b][i], "valid")
-                    input_gradient[b][j] += signal.convolve2d(output_gradient[b][i], self.kernels[i, j], "full")
+                    self.dkernels[i, j] = signal.correlate2d(self.input[b][j], self.dbiases[b][i], "valid")
+                    input_gradient[b][j] += signal.convolve2d(self.dbiases[b][i], self.kernels[i, j], "full")
 
-        self.kernels -= self.learning_rate * kernels_gradient
-        self.biases -= self.learning_rate * output_gradient
         self.dinputs = input_gradient
 
 
@@ -192,8 +191,6 @@ class Optimizer_SGD:
                 (1. / (1. + self.decay * self.iterations))
 
     def update_params(self, layer):
-        # ------
-        # Добавить логику оптимайзера
         if hasattr(layer, 'weights'):
             if self.momentum:
 
@@ -219,6 +216,34 @@ class Optimizer_SGD:
                             layer.dbiases
 
             layer.weights += weight_updates
+            layer.biases += bias_updates
+
+        # Для convolutional
+        elif hasattr(layer, 'kernels'):
+            if self.momentum:
+
+                if not hasattr(layer, 'kernel_momentums'):
+                    layer.kernel_momentums = np.zeros_like(layer.kernels)
+
+                    layer.bias_momentums = np.zeros_like(layer.biases)
+
+                kernel_updates = \
+                    self.momentum * layer.kernel_momentums - \
+                    self.current_learning_rate * layer.dkernels
+                layer.kernel_momentums = weight_updates
+
+                bias_updates = \
+                    self.momentum * layer.bias_momentums - \
+                    self.current_learning_rate * layer.dbiases
+                layer.bias_momentums = bias_updates
+
+            else:
+                kernel_updates = -self.current_learning_rate * \
+                                layer.dkernels
+                bias_updates = -self.current_learning_rate * \
+                            layer.dbiases
+
+            layer.kernels += kernel_updates
             layer.biases += bias_updates
 
     def post_update_params(self):
@@ -861,7 +886,7 @@ model.add(Activation_Softmax())
 
 model.set(
     loss=Loss_CategoricalCrossentropy(),
-    optimizer=Optimizer_Adam(decay=1e-3),
+    optimizer=Optimizer_SGD(decay=1e-3, momentum=0.5),
     accuracy=Accuracy_Categorical()
 )
 
