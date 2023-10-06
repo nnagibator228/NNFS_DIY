@@ -230,7 +230,7 @@ class Optimizer_SGD:
                 kernel_updates = \
                     self.momentum * layer.kernel_momentums - \
                     self.current_learning_rate * layer.dkernels
-                layer.kernel_momentums = weight_updates
+                layer.kernel_momentums = kernel_updates
 
                 bias_updates = \
                     self.momentum * layer.bias_momentums - \
