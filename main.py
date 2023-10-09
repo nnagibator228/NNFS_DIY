@@ -455,7 +455,7 @@ class Loss:
 
         for layer in self.trainable_layers:
             if hasattr(layer, 'kernels'):
-                if hasattr(layer, 'kernel_regularizer'):
+                if not hasattr(layer, 'kernel_regularizer'):
                     layer.kernel_regularizer_l1 = 0
                     layer.kernel_regularizer_l2 = 0
                     layer.bias_regularizer_l1 = 0
@@ -465,8 +465,8 @@ class Loss:
                     regularization_loss += layer.kernel_regularizer_l1 * \
                                            np.sum(np.abs(layer.kernels))
 
-                if layer.kernels_regularizer_l2 > 0:
-                    regularization_loss += layer.weight_regularizer_l2 * \
+                if layer.kernel_regularizer_l2 > 0:
+                    regularization_loss += layer.kernels_regularizer_l2 * \
                                            np.sum(layer.kernels * \
                                                   layer.kernels)
 
@@ -478,24 +478,24 @@ class Loss:
                     regularization_loss += layer.bias_regularizer_l2 * \
                                            np.sum(layer.biases * \
                                                   layer.biases)
+            else:
+                if layer.weight_regularizer_l1 > 0:
+                    regularization_loss += layer.weight_regularizer_l1 * \
+                                           np.sum(np.abs(layer.weights))
 
-            if layer.weight_regularizer_l1 > 0:
-                regularization_loss += layer.weight_regularizer_l1 * \
-                                       np.sum(np.abs(layer.weights))
+                if layer.weight_regularizer_l2 > 0:
+                    regularization_loss += layer.weight_regularizer_l2 * \
+                                           np.sum(layer.weights * \
+                                                  layer.weights)
 
-            if layer.weight_regularizer_l2 > 0:
-                regularization_loss += layer.weight_regularizer_l2 * \
-                                       np.sum(layer.weights * \
-                                              layer.weights)
+                if layer.bias_regularizer_l1 > 0:
+                    regularization_loss += layer.bias_regularizer_l1 * \
+                                           np.sum(np.abs(layer.biases))
 
-            if layer.bias_regularizer_l1 > 0:
-                regularization_loss += layer.bias_regularizer_l1 * \
-                                       np.sum(np.abs(layer.biases))
-
-            if layer.bias_regularizer_l2 > 0:
-                regularization_loss += layer.bias_regularizer_l2 * \
-                                       np.sum(layer.biases * \
-                                              layer.biases)
+                if layer.bias_regularizer_l2 > 0:
+                    regularization_loss += layer.bias_regularizer_l2 * \
+                                           np.sum(layer.biases * \
+                                                  layer.biases)
 
         return regularization_loss
 
@@ -736,6 +736,9 @@ class Model:
             if hasattr(self.layers[i], 'weights'):
                 self.trainable_layers.append(self.layers[i])
 
+            if hasattr(self.layers[i], 'kernels'):
+                self.trainable_layers.append(self.layers[i])
+
         self.loss.remember_trainable_layers(
             self.trainable_layers
         )
@@ -960,13 +963,13 @@ model.add(Activation_Softmax())
 
 model.set(
     loss=Loss_CategoricalCrossentropy(),
-    optimizer=Optimizer_Adam(),
+    optimizer=Optimizer_Adam(decay=1e-3),
     accuracy=Accuracy_Categorical()
 )
 
 model.finalize()
 
-model.train(X, y, validation_data=(X_test, y_test), epochs=20, batch_size=items * classes, print_every=100)
+model.train(X, y, validation_data=(X_test, y_test), epochs=50, batch_size=items * classes, print_every=100)
 print("-" * 21)
 print("Testing with test vals: ")
 model.evaluate(X_test, y_test)
