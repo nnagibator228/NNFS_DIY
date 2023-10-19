@@ -1,9 +1,28 @@
 # NNFS_DIY
-NNFS trum-trum from scratch &amp; paper diy for kids
+## Custom Neural Network Framework written from scratch
 
-> **TODO**
-> add dataset zip archive
+>How to use
 
-Гойда Гойда сисян зачилься
+Create `Model` object
+```python
+import Model from NNFS_DIY
+model = Model()
 
-> УРАААААААААААА 
+model.add(...)
+...
+
+model.set(
+    loss=*Loss Class*,
+    optimizer=*Optimizer Class*,
+    accuracy=*Accuracy Class*
+)
+
+model.finalize()
+
+model.train(*Input Data*, *Output Data*,
+            validation_data=(*Test Input*, *Test Output*), 
+            epochs=*Epochs*, 
+            batch_size=*Items in batch*,
+            print_every=*No of epoch*)
+
+```
