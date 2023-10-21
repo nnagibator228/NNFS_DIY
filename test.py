@@ -1,29 +1,36 @@
-class Convolutional:
-    def __init__(self, input_shape, kernel_size, depth):
-        input_depth, input_height, input_width = input_shape
-        self.depth = depth
-        self.input_shape = input_shape
-        self.input_depth = input_depth
-        self.output_shape = (depth, input_height - kernel_size + 1, input_width - kernel_size + 1)
-        self.kernels_shape = (depth, input_depth, kernel_size, kernel_size)
-        self.kernels = np.random.randn(*self.kernels_shape)
-        self.biases = np.random.randn(*self.output_shape)
+from models.Model import Model
+from layers.Convolutional import Convolutional
+from layers.activations.Activation_Sigmoid import Activation_Sigmoid
+from layers.Reshape import Reshape
+from layers.Layer_Dense import Layer_Dense
+from layers.activations.Activation_ReLU import Activation_ReLU
+from layers.activations.Activation_Softmax import Activation_Softmax
+from losses.Loss_CategoricalCrossentropy import Loss_CategoricalCrossentropy
+from optimizers.Optimizer_Adam import Optimizer_Adam
+from accuracy.Accuracy_Categorical import Accuracy_Categorical
+from utils.preprocess_data import X, y, X_test, y_test, items, classes
 
-    def forward(self, input):
-        self.input = input
-        self.output = np.copy(self.biases)
-        for i in range(self.depth):
-            for j in range(self.input_depth):
-                self.output[i] += signal.correlate2d(self.input[j], self.kernels[i, j], "valid")
-        return self.output
+model = Model()
 
-    def backward(self, output_gradient, learning_rate):
-        kernels_gradient = np.zeros(self.kernels_shape)
-        input_gradient = np.zeros(self.input_shape)
-        for i in range(self.depth):
-            for j in range(self.input_depth):
-                kernels_gradient[i, j] = signal.correlate2d(self.input[j], output_gradient[i], "valid")
-                input_gradient[j] += signal.convolve2d(output_gradient[i], self.kernels[i, j], "full")
-        self.kernels -= learning_rate * kernels_gradient
-        self.biases -= learning_rate * output_gradient
-        return input_gradient
+model.add(Convolutional((items * classes, 1, 28, 28), 3, 5))
+model.add(Activation_Sigmoid())
+model.add(Reshape((items * classes, 5, 26, 26), (items * classes, 5 * 26 * 26, 1)))
+model.add(Layer_Dense(5 * 26 * 26, 128))
+model.add(Activation_ReLU())
+model.add(Layer_Dense(128, 128))
+model.add(Activation_ReLU())
+model.add(Layer_Dense(128, classes))
+model.add(Activation_Softmax())
+
+model.set(
+    loss=Loss_CategoricalCrossentropy(),
+    optimizer=Optimizer_Adam(decay=1e-3),
+    accuracy=Accuracy_Categorical()
+)
+
+model.finalize()
+
+model.train(X, y, validation_data=(X_test, y_test), epochs=75, batch_size=items * classes, print_every=100)
+print("-" * 21)
+print("Testing with test vals: ")
+model.evaluate(X_test, y_test)

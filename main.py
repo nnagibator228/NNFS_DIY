@@ -58,8 +58,8 @@ class Convolutional:
         self.kernels = np.random.randn(*self.kernels_shape)
         self.biases = np.random.randn(*self.output_shape)
 
-    def forward(self, input, training):
-        self.input = input
+    def forward(self, inputs, training):
+        self.input = inputs
         self.output = np.copy(self.biases)
         for b in range(self.batch_size):
             for i in range(self.depth):
@@ -576,8 +576,6 @@ class Activation_Softmax_Loss_CategoricalCrossentropy():
         self.dinputs[range(samples), y_true] -= 1
         self.dinputs = self.dinputs / samples
 
-
-# (items*2, 5, 26, 26)
 
 class Reshape:
     def __init__(self, input_shape, output_shape):
