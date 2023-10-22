@@ -13,7 +13,7 @@
 
 <div align="center">
     
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1pUW5rRX4Z_DEVDFLZi-90cBYw-38Rp_a?usp=sharing)]
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1pUW5rRX4Z_DEVDFLZi-90cBYw-38Rp_a?usp=sharing)
 
 </div>
 
