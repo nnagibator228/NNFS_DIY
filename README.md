@@ -10,9 +10,10 @@
 ![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white)
 
 </div>
+
 <div align="center">
     
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1pUW5rRX4Z_DEVDFLZi-90cBYw-38Rp_a?usp=sharing]
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1pUW5rRX4Z_DEVDFLZi-90cBYw-38Rp_a?usp=sharing)]
 
 </div>
 
