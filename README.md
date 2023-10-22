@@ -1,4 +1,4 @@
-<h1 align="center"><b><u>NNFS</u></b></h1>
+<h1 align="center"><b><u>🌐 NNFS</u></b></h1>
 
 
 <h3 align="center">Convolutional Neural Network Framework from scratch</h3>
