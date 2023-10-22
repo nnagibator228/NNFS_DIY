@@ -4,12 +4,16 @@
 <h3 align="center">Convolutional Neural Network Framework from scratch</h3>
 
 <div align="center">
+    
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
 ![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white)
+
 </div>
 <div align="center">
+    
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1pUW5rRX4Z_DEVDFLZi-90cBYw-38Rp_a?usp=sharing]
+
 </div>
 
 ---
